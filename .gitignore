@@ -10,11 +10,4 @@ build/
 dist/
 *.egg-info/
 
-.omx/logs/
-.omx/metrics.json
-.omx/tmux-hook.json
-.omx/state/**
-!.omx/state/
-!.omx/state/sessions/
-!.omx/state/sessions/019ec467-689c-7402-8dda-c392cf29e196/
-!.omx/state/sessions/019ec467-689c-7402-8dda-c392cf29e196/ralplan-handoff-gnn-tutorial-product-20260614T050048Z.json
+.omx/
