@@ -10,6 +10,8 @@ Notebooks are optional companions to the Python scripts. Chapter notebooks live 
   guided walkthrough.
 - Notebook code should call the versioned chapter scripts instead of duplicating
   the tutorial implementation.
+- When chapter metadata changes, run `python tools/sync_tutorial_assets.py` so
+  README links and notebook wrappers stay aligned with the curriculum manifest.
 - Notebook outputs should be lightweight. Avoid committing large generated data.
 - Quick-tour notebooks should run on CPU.
 - If a notebook is too expensive or too flaky for automated execution, the chapter

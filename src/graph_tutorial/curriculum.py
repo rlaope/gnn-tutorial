@@ -32,6 +32,23 @@ class StudyTrack:
 
 
 @dataclass(frozen=True)
+class TutorialLink:
+    """README and notebook display metadata for one chapter."""
+
+    chapter_id: str
+    title: str
+    summary: str
+
+
+@dataclass(frozen=True)
+class TutorialSection:
+    """A linked README curriculum section."""
+
+    title: str
+    chapter_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class BuilderOutcome:
     """A product-builder milestone produced by a contiguous chapter group."""
 
@@ -140,6 +157,98 @@ STUDY_TRACKS: tuple[StudyTrack, ...] = (
     ),
 )
 
+TUTORIAL_LINKS: tuple[TutorialLink, ...] = (
+    TutorialLink(
+        "00-why-graph-learning",
+        "Why Graph Learning",
+        "Map product questions to graph tasks.",
+    ),
+    TutorialLink(
+        "01-graph-basics",
+        "Graph Basics",
+        "Turn records into edge_index, features, labels, and adjacency.",
+    ),
+    TutorialLink(
+        "02-message-passing-by-hand",
+        "Message Passing By Hand",
+        "Trace aggregation, self-loops, and normalization.",
+    ),
+    TutorialLink(
+        "03-random-walk",
+        "Random Walk",
+        "Sample local neighborhoods as sequences.",
+    ),
+    TutorialLink(
+        "04-deepwalk",
+        "DeepWalk",
+        "Convert walk contexts into node embeddings.",
+    ),
+    TutorialLink(
+        "05-node2vec",
+        "Node2Vec",
+        "Tune local-vs-outward similarity with biased walks.",
+    ),
+    TutorialLink(
+        "06-gcn",
+        "GCN",
+        "Train a suspicious-node classifier with normalized aggregation.",
+    ),
+    TutorialLink(
+        "07-graphsage",
+        "GraphSAGE",
+        "Score new nodes with sampled neighborhood features.",
+    ),
+    TutorialLink(
+        "08-gat",
+        "GAT",
+        "Inspect neighbor attention weights.",
+    ),
+    TutorialLink(
+        "09-link-prediction",
+        "Link Prediction",
+        "Rank missing user-item relations as recommendation candidates.",
+    ),
+    TutorialLink(
+        "10-graph-classification",
+        "Graph Classification",
+        "Pool node embeddings into graph-level predictions.",
+    ),
+)
+
+TUTORIAL_SECTIONS: tuple[TutorialSection, ...] = (
+    TutorialSection(
+        "1. Graph Foundations",
+        (
+            "00-why-graph-learning",
+            "01-graph-basics",
+            "02-message-passing-by-hand",
+        ),
+    ),
+    TutorialSection(
+        "2. Walks and Embeddings",
+        (
+            "03-random-walk",
+            "04-deepwalk",
+            "05-node2vec",
+        ),
+    ),
+    TutorialSection(
+        "3. Message-Passing GNNs",
+        (
+            "06-gcn",
+            "07-graphsage",
+            "08-gat",
+        ),
+    ),
+    TutorialSection(
+        "4. Product Graph Tasks",
+        (
+            "09-link-prediction",
+            "10-graph-classification",
+        ),
+    ),
+)
+
 BUILDER_OUTCOMES: tuple[BuilderOutcome, ...] = (
     BuilderOutcome(
         "G003",
@@ -191,3 +300,9 @@ def chapter_ids() -> tuple[str, ...]:
     """Return chapter ids in canonical order."""
 
     return tuple(chapter.chapter_id for chapter in CURRICULUM)
+
+
+def tutorial_link_by_id() -> dict[str, TutorialLink]:
+    """Return tutorial link metadata keyed by chapter id."""
+
+    return {link.chapter_id: link for link in TUTORIAL_LINKS}

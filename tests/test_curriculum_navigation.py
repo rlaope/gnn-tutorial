@@ -9,11 +9,14 @@ from graph_tutorial.curriculum import (
     CURRICULUM,
     PRODUCT_SCOPE,
     STUDY_TRACKS,
+    TUTORIAL_SECTIONS,
     chapter_ids,
 )
+from tests.chapter_test_utils import load_module
 
 ROOT = Path(__file__).resolve().parents[1]
 CHAPTERS = chapter_ids()
+SYNC_TOOL = load_module(ROOT / "tools/sync_tutorial_assets.py", "sync_tutorial_assets")
 
 
 def test_readme_curriculum_points_to_existing_chapters() -> None:
@@ -28,6 +31,23 @@ def test_readme_curriculum_points_to_existing_chapters() -> None:
         for filename in ("README.md", "chapter.py", "exercise.py", "solution.py"):
             assert (chapter_dir / filename).is_file(), f"{chapter}/{filename} missing"
             assert f"chapters/{chapter}/{filename}" in readme
+
+
+def test_tutorial_links_are_generated_from_manifest() -> None:
+    readme = (ROOT / "README.md").read_text()
+    actual = readme.split(SYNC_TOOL.README_START, maxsplit=1)[1].split(
+        SYNC_TOOL.README_END,
+        maxsplit=1,
+    )[0]
+    expected = "\n" + SYNC_TOOL.render_tutorial_links()
+    assert actual == expected
+
+    section_chapters = tuple(
+        chapter_id
+        for section in TUTORIAL_SECTIONS
+        for chapter_id in section.chapter_ids
+    )
+    assert section_chapters == CHAPTERS
 
 
 def test_readme_curriculum_matches_manifest_order() -> None:
@@ -119,6 +139,7 @@ def test_public_docs_do_not_reference_local_agent_artifacts() -> None:
 def test_notebooks_are_lightweight_chapter_wrappers() -> None:
     for chapter in CHAPTERS:
         notebook_path = ROOT / "notebooks" / f"{chapter}.ipynb"
+        assert notebook_path.read_text() == SYNC_TOOL.render_notebook_text(chapter)
         notebook = json.loads(notebook_path.read_text())
         assert notebook["nbformat"] == 4
         assert notebook["metadata"]["kernelspec"]["language"] == "python"

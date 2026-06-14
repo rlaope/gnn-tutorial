@@ -33,13 +33,14 @@ Notebooks are local Jupyter companions that call the versioned chapter scripts. 
 
 ## Tutorial Links
 
+<!-- tutorial-links:start -->
 #### 1. Graph Foundations
 
 - 00. [Why Graph Learning](chapters/00-why-graph-learning/README.md) - Map product questions to graph tasks.
   - Code - [chapter.py](chapters/00-why-graph-learning/chapter.py)
   - Notebook - [Jupyter](notebooks/00-why-graph-learning.ipynb)
   - Practice - [exercise.py](chapters/00-why-graph-learning/exercise.py), [solution.py](chapters/00-why-graph-learning/solution.py)
-- 01. [Graph Basics](chapters/01-graph-basics/README.md) - Turn records into `edge_index`, features, labels, and adjacency.
+- 01. [Graph Basics](chapters/01-graph-basics/README.md) - Turn records into edge_index, features, labels, and adjacency.
   - Code - [chapter.py](chapters/01-graph-basics/chapter.py)
   - Notebook - [Jupyter](notebooks/01-graph-basics.ipynb)
   - Practice - [exercise.py](chapters/01-graph-basics/exercise.py), [solution.py](chapters/01-graph-basics/solution.py)
@@ -88,6 +89,7 @@ Notebooks are local Jupyter companions that call the versioned chapter scripts. 
   - Code - [chapter.py](chapters/10-graph-classification/chapter.py)
   - Notebook - [Jupyter](notebooks/10-graph-classification.ipynb)
   - Practice - [exercise.py](chapters/10-graph-classification/exercise.py), [solution.py](chapters/10-graph-classification/solution.py)
+<!-- tutorial-links:end -->
 
 ## v1 Scope Promise
 
@@ -146,6 +148,7 @@ gnn-tutorial/
   chapters/
   notebooks/
   tests/
+  tools/
 ```
 
 ## Setup
