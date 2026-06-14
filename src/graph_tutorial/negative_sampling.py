@@ -39,6 +39,30 @@ def sample_negative_edges(
     return edge_list_to_edge_index(rng.sample(candidates, num_samples))
 
 
+def sample_bipartite_negative_edges(
+    *,
+    left_nodes: range,
+    right_nodes: range,
+    positive_edge_index: torch.Tensor,
+    num_samples: int,
+    seed: int = 0,
+) -> torch.Tensor:
+    """Sample absent edges across two node partitions."""
+
+    if num_samples < 0:
+        raise ValueError("num_samples must be non-negative")
+    blocked = _blocked_edges(positive_edge_index, undirected=True)
+    candidates: list[Edge] = []
+    for src in left_nodes:
+        for dst in right_nodes:
+            if (min(src, dst), max(src, dst)) not in blocked:
+                candidates.append((src, dst))
+    if num_samples > len(candidates):
+        raise ValueError("num_samples exceeds available bipartite negative edges")
+    rng = random.Random(seed)
+    return edge_list_to_edge_index(rng.sample(candidates, num_samples))
+
+
 def _blocked_edges(edge_index: torch.Tensor, *, undirected: bool) -> set[Edge]:
     blocked: set[Edge] = set()
     for src, dst in edge_index_to_edge_list(edge_index):
