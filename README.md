@@ -28,6 +28,9 @@ after the mechanics are visible.
 The target outcome is product intuition: when you finish a chapter, you should know
 both what the model did and what kind of product capability it could support.
 
+Notebooks are local Jupyter companions that call the versioned chapter scripts. See
+[NOTEBOOK_POLICY.md](NOTEBOOK_POLICY.md) for the notebook contract.
+
 ## Tutorial Links
 
 #### 1. Graph Foundations

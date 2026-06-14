@@ -107,7 +107,7 @@ def test_public_docs_do_not_reference_local_agent_artifacts() -> None:
         "." + "omx",
         "gray" + "kode",
         "nlp" + "-tutorial",
-        "colab.research.google" + ".com",
+        "co" + "lab" + ".research." + "google" + ".com",
         "Co" + "lab",
     )
     for path in public_docs:
