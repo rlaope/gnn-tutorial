@@ -3,7 +3,13 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from graph_tutorial.curriculum import CURRICULUM, PRODUCT_SCOPE, STUDY_TRACKS, chapter_ids
+from graph_tutorial.curriculum import (
+    BUILDER_OUTCOMES,
+    CURRICULUM,
+    PRODUCT_SCOPE,
+    STUDY_TRACKS,
+    chapter_ids,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 CHAPTERS = chapter_ids()
@@ -21,7 +27,11 @@ def test_readme_curriculum_points_to_existing_chapters() -> None:
 
 def test_readme_curriculum_matches_manifest_order() -> None:
     readme = (ROOT / "README.md").read_text()
-    rows = re.findall(r"\| `([^`]+)` \| ([^|]+) \| ([^|]+) \|", readme)
+    curriculum_section = readme.split("## Curriculum", maxsplit=1)[1].split(
+        "## Repository Layout",
+        maxsplit=1,
+    )[0]
+    rows = re.findall(r"\| `([^`]+)` \| ([^|]+) \| ([^|]+) \|", curriculum_section)
     assert rows == [
         (chapter.chapter_id, chapter.product_lens, chapter.core_idea)
         for chapter in CURRICULUM
@@ -54,6 +64,38 @@ def test_study_tracks_reference_only_existing_chapters() -> None:
     for track in STUDY_TRACKS:
         for chapter_id in track.chapter_ids:
             assert chapter_id in study_doc
+
+
+def test_builder_outcomes_are_documented_and_reference_existing_chapters() -> None:
+    guide = (ROOT / "PRODUCT_BUILDER_GUIDE.md").read_text()
+    readme = (ROOT / "README.md").read_text()
+    study_doc = (ROOT / "HOW_TO_STUDY.md").read_text()
+
+    seen_chapters: list[str] = []
+    for outcome in BUILDER_OUTCOMES:
+        assert outcome.goal_id in readme
+        assert outcome.goal_id in study_doc
+        assert outcome.goal_id in guide
+        assert outcome.role in guide
+        assert outcome.artifact in guide
+        assert outcome.product_capability in guide
+        for chapter_id in outcome.chapter_ids:
+            assert chapter_id in CHAPTERS
+            assert chapter_id in guide
+            seen_chapters.append(chapter_id)
+
+    assert tuple(seen_chapters) == CHAPTERS
+
+
+def test_public_docs_do_not_reference_local_agent_artifacts() -> None:
+    public_docs = [
+        ROOT / "README.md",
+        ROOT / "HOW_TO_STUDY.md",
+        ROOT / "PRODUCT_BUILDER_GUIDE.md",
+        ROOT / "NOTEBOOK_POLICY.md",
+    ]
+    for path in public_docs:
+        assert ".omx" not in path.read_text()
 
 
 def test_completed_chapters_do_not_need_gitkeep_placeholders() -> None:

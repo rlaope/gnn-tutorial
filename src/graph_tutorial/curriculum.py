@@ -31,6 +31,17 @@ class StudyTrack:
     chapter_ids: tuple[str, ...]
 
 
+@dataclass(frozen=True)
+class BuilderOutcome:
+    """A product-builder milestone produced by a contiguous chapter group."""
+
+    goal_id: str
+    role: str
+    chapter_ids: tuple[str, ...]
+    artifact: str
+    product_capability: str
+
+
 CURRICULUM: tuple[Chapter, ...] = (
     Chapter(
         "00-why-graph-learning",
@@ -126,6 +137,52 @@ STUDY_TRACKS: tuple[StudyTrack, ...] = (
             "09-link-prediction",
             "10-graph-classification",
         ),
+    ),
+)
+
+BUILDER_OUTCOMES: tuple[BuilderOutcome, ...] = (
+    BuilderOutcome(
+        "G003",
+        "Graph problem modeler",
+        (
+            "00-why-graph-learning",
+            "01-graph-basics",
+            "02-message-passing-by-hand",
+        ),
+        "A graph task brief plus tensor trace for nodes, edges, features, and one message pass.",
+        "Translate connected product records into inspectable graph-learning inputs.",
+    ),
+    BuilderOutcome(
+        "G004",
+        "Graph embedding candidate generator",
+        (
+            "03-random-walk",
+            "04-deepwalk",
+            "05-node2vec",
+        ),
+        "A walk corpus, embedding table, and nearest-neighbor comparison.",
+        "Prototype similar-user/item exploration before a ranking system exists.",
+    ),
+    BuilderOutcome(
+        "G005",
+        "Message-passing GNN prototyper",
+        (
+            "06-gcn",
+            "07-graphsage",
+            "08-gat",
+        ),
+        "A node classifier, new-node inference path, and attention inspection table.",
+        "Build toy suspicious-node, cold-start, and neighbor-influence workflows.",
+    ),
+    BuilderOutcome(
+        "G006",
+        "Graph product task builder",
+        (
+            "09-link-prediction",
+            "10-graph-classification",
+        ),
+        "A recommendation candidate table plus a graph-level classifier report.",
+        "Frame missing-relation and whole-graph prediction as product-facing prototypes.",
     ),
 )
 

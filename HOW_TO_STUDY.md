@@ -75,3 +75,18 @@ Each complete chapter follows the same learning loop:
 
 If a chapter feels too abstract, go back to the trace and break/fix sections. That
 is where graph learning usually becomes tangible.
+
+## Builder Milestones
+
+Treat each goal slice as a portfolio checkpoint, not only a reading assignment.
+
+| Goal slice | Finish when you can produce | Reviewer question |
+|---|---|---|
+| `G003` | A graph task brief and tensor trace. | Can another developer tell what the nodes, edges, features, and target are? |
+| `G004` | A walk corpus, embedding table, and nearest-neighbor comparison. | Did you explain what "similar" means for this product? |
+| `G005` | A node classifier, new-node prediction, and attention inspection. | Did you separate useful inspection from production explainability claims? |
+| `G006` | A recommendation candidate table and graph-classifier report. | Did you state what ranking, serving, and validation work is still missing? |
+
+The practical end state is not "I know GNN names." It is "I can turn connected
+records into a small graph-learning prototype, trace the tensors, and explain the
+product boundary without overselling it."

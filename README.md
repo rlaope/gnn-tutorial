@@ -42,6 +42,19 @@ mapping is deliberately explicit so the tutorial does not overclaim.
 | Missing-relation search foundation | `09-link-prediction` | No production Graph RAG or knowledge graph search readiness. |
 | Graph-level classification | `10-graph-classification` | Small graph examples, not large domain benchmarks. |
 
+## Builder Outcome
+
+Use [PRODUCT_BUILDER_GUIDE.md](PRODUCT_BUILDER_GUIDE.md) to connect the chapter
+sequence to portfolio artifacts and product-builder roles. The intended progression
+is:
+
+| Goal slice | Builder role | Output |
+|---|---|---|
+| `G003` | Graph problem modeler | Graph task brief and tensor trace. |
+| `G004` | Graph embedding candidate generator | Walk corpus, embeddings, and nearest-neighbor comparison. |
+| `G005` | Message-passing GNN prototyper | Node classifier, new-node inference, and attention inspection. |
+| `G006` | Graph product task builder | Recommendation candidates and graph-level classifier report. |
+
 ## Curriculum
 
 | Chapter | Product lens | Core idea |
@@ -64,6 +77,7 @@ mapping is deliberately explicit so the tutorial does not overclaim.
 gnn-tutorial/
   README.md
   HOW_TO_STUDY.md
+  PRODUCT_BUILDER_GUIDE.md
   NOTEBOOK_POLICY.md
   pyproject.toml
   data/
@@ -87,7 +101,5 @@ large downloads or a GPU.
 
 ## Development Status
 
-The implementation is driven by the durable plan in
-`.omx/ultragoal/goals.json`. The approved planning artifacts live under `.omx/`.
-The tutorial itself lives in top-level docs, `src/graph_tutorial`, `chapters`, and
-`tests`.
+The versioned tutorial lives in top-level docs, `src/graph_tutorial`, `chapters`,
+and `tests`. Local agent/runtime artifacts are intentionally excluded from git.
