@@ -103,8 +103,17 @@ def test_public_docs_do_not_reference_local_agent_artifacts() -> None:
         ROOT / "PRODUCT_BUILDER_GUIDE.md",
         ROOT / "NOTEBOOK_POLICY.md",
     ]
+    forbidden_terms = (
+        "." + "omx",
+        "gray" + "kode",
+        "nlp" + "-tutorial",
+        "colab.research.google" + ".com",
+        "Co" + "lab",
+    )
     for path in public_docs:
-        assert ".omx" not in path.read_text()
+        text = path.read_text()
+        for term in forbidden_terms:
+            assert term not in text
 
 
 def test_notebooks_are_lightweight_chapter_wrappers() -> None:
