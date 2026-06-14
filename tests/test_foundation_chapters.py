@@ -1,43 +1,14 @@
 from __future__ import annotations
 
-import importlib.util
-import os
-import subprocess
-import sys
-from pathlib import Path
-
 import torch
 
-ROOT = Path(__file__).resolve().parents[1]
+from tests.chapter_test_utils import ROOT, load_module, run_script
+
 FOUNDATION_CHAPTERS = [
     "00-why-graph-learning",
     "01-graph-basics",
     "02-message-passing-by-hand",
 ]
-
-
-def load_module(path: Path, name: str):
-    spec = importlib.util.spec_from_file_location(name, path)
-    assert spec is not None
-    assert spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
-def run_script(path: Path) -> str:
-    env = os.environ.copy()
-    src_path = str(ROOT / "src")
-    env["PYTHONPATH"] = f"{src_path}{os.pathsep}{env.get('PYTHONPATH', '')}"
-    result = subprocess.run(
-        [sys.executable, str(path)],
-        cwd=ROOT,
-        env=env,
-        text=True,
-        capture_output=True,
-        check=True,
-    )
-    return result.stdout
 
 
 def test_foundation_chapters_have_required_files() -> None:

@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 
+from graph_tutorial.curriculum import PRODUCT_SCOPE
 from graph_tutorial.datasets import (
     bipartite_recommendation_graph,
     suspicious_accounts_graph,
@@ -29,25 +31,25 @@ def task_catalog() -> list[ProductQuestion]:
             "Which account looks risky because of shared devices?",
             "node",
             "node classification",
-            "06-gcn / 07-graphsage",
+            PRODUCT_SCOPE[1].primary_chapter.replace(", ", " / "),
         ),
         ProductQuestion(
             "Which user-item relation should we recommend next?",
             "edge",
             "link prediction",
-            "09-link-prediction",
+            PRODUCT_SCOPE[0].primary_chapter,
         ),
         ProductQuestion(
             "Which neighbor most influenced this score?",
             "edge neighborhood",
             "attention / influence inspection",
-            "08-gat",
+            PRODUCT_SCOPE[2].primary_chapter,
         ),
         ProductQuestion(
             "What label belongs to this whole molecule or workflow graph?",
             "whole graph",
             "graph classification",
-            "10-graph-classification",
+            PRODUCT_SCOPE[4].primary_chapter,
         ),
     ]
 
@@ -73,7 +75,7 @@ def graph_snapshots() -> list[tuple[str, int, int, str]]:
     return rows
 
 
-def format_table(headers: tuple[str, ...], rows: list[tuple[object, ...]]) -> str:
+def format_table(headers: Sequence[str], rows: Sequence[Sequence[object]]) -> str:
     """Render a tiny markdown-style table without extra dependencies."""
 
     table = [" | ".join(headers), " | ".join(["---"] * len(headers))]

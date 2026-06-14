@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+from typing import TypedDict
+
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -13,6 +16,23 @@ from graph_tutorial.negative_sampling import sample_bipartite_negative_edges
 
 USERS = range(0, 4)
 ITEMS = range(4, 9)
+
+
+@dataclass(frozen=True)
+class LinkPredictionSplit:
+    """Disjoint positive and negative edges for a tiny link-prediction lab."""
+
+    train_pos: torch.Tensor
+    train_neg: torch.Tensor
+    test_pos: torch.Tensor
+    test_neg: torch.Tensor
+
+
+class LinkPredictorResult(TypedDict):
+    loss_first: float
+    loss_final: float
+    metrics: dict[str, float]
+    top_recommendations: list[tuple[int, int, float]]
 
 
 class DotProductLinkPredictor(nn.Module):
@@ -51,30 +71,39 @@ def candidate_edges(existing_edge_index: torch.Tensor) -> torch.Tensor:
     return edge_list_to_edge_index(candidates)
 
 
-def train_link_predictor() -> dict[str, object]:
+def build_link_prediction_split(edge_index: torch.Tensor) -> LinkPredictionSplit:
+    """Build a disjoint user-item train/test split."""
+
+    positive_edges = edge_list_to_edge_index(sorted(unique_user_item_edges(edge_index)))
+    train_pos = positive_edges[:, :-2]
+    test_pos = positive_edges[:, -2:]
+    negative_edges = sample_bipartite_negative_edges(
+        left_nodes=USERS,
+        right_nodes=ITEMS,
+        positive_edge_index=edge_index,
+        num_samples=train_pos.shape[1] + test_pos.shape[1],
+        seed=52,
+    )
+    train_neg = negative_edges[:, : train_pos.shape[1]]
+    test_neg = negative_edges[:, train_pos.shape[1] :]
+    return LinkPredictionSplit(
+        train_pos=train_pos,
+        train_neg=train_neg,
+        test_pos=test_pos,
+        test_neg=test_neg,
+    )
+
+
+def train_link_predictor() -> LinkPredictorResult:
     """Train a tiny dot-product model and rank missing user-item edges."""
 
     torch.manual_seed(51)
     graph = bipartite_recommendation_graph()
-    positive_edges = edge_list_to_edge_index(sorted(unique_user_item_edges(graph.edge_index)))
-    train_pos = positive_edges[:, :-2]
-    test_pos = positive_edges[:, -2:]
-    train_neg = sample_bipartite_negative_edges(
-        left_nodes=USERS,
-        right_nodes=ITEMS,
-        positive_edge_index=graph.edge_index,
-        num_samples=train_pos.shape[1],
-        seed=52,
+    split = build_link_prediction_split(graph.edge_index)
+    train_edges = torch.cat([split.train_pos, split.train_neg], dim=1)
+    train_labels = torch.cat(
+        [torch.ones(split.train_pos.shape[1]), torch.zeros(split.train_neg.shape[1])]
     )
-    test_neg = sample_bipartite_negative_edges(
-        left_nodes=USERS,
-        right_nodes=ITEMS,
-        positive_edge_index=graph.edge_index,
-        num_samples=test_pos.shape[1],
-        seed=53,
-    )
-    train_edges = torch.cat([train_pos, train_neg], dim=1)
-    train_labels = torch.cat([torch.ones(train_pos.shape[1]), torch.zeros(train_neg.shape[1])])
 
     model = DotProductLinkPredictor(graph.num_nodes)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.08, weight_decay=1e-3)
@@ -86,8 +115,10 @@ def train_link_predictor() -> dict[str, object]:
         optimizer.step()
         losses.append(float(loss.item()))
 
-    test_edges = torch.cat([test_pos, test_neg], dim=1)
-    test_labels = torch.cat([torch.ones(test_pos.shape[1]), torch.zeros(test_neg.shape[1])])
+    test_edges = torch.cat([split.test_pos, split.test_neg], dim=1)
+    test_labels = torch.cat(
+        [torch.ones(split.test_pos.shape[1]), torch.zeros(split.test_neg.shape[1])]
+    )
     with torch.no_grad():
         test_scores = model(test_edges)
         metrics = binary_link_metrics(torch.sigmoid(test_scores), test_labels)

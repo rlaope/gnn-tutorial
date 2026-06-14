@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import TypedDict
+
 import torch
 
 from graph_tutorial.datasets import GraphData
@@ -23,6 +25,13 @@ CUSTOMERS = [
 FRIENDSHIPS = [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (0, 2), (3, 5), (1, 4)]
 
 
+class GraphSummary(TypedDict):
+    x_shape: tuple[int, int]
+    edge_index_shape: tuple[int, int]
+    adjacency: torch.Tensor
+    degree: torch.Tensor
+
+
 def records_to_graph() -> GraphData:
     """Convert row-like product records into graph tensors."""
 
@@ -36,12 +45,12 @@ def records_to_graph() -> GraphData:
     )
 
 
-def graph_summary(graph: GraphData) -> dict[str, object]:
+def graph_summary(graph: GraphData) -> GraphSummary:
     """Return the inspectable graph objects for the lab."""
 
     return {
-        "x_shape": tuple(graph.x.shape),
-        "edge_index_shape": tuple(graph.edge_index.shape),
+        "x_shape": (int(graph.x.shape[0]), int(graph.x.shape[1])),
+        "edge_index_shape": (int(graph.edge_index.shape[0]), int(graph.edge_index.shape[1])),
         "adjacency": edge_index_to_adjacency(graph.edge_index, graph.num_nodes),
         "degree": degree(graph.edge_index, graph.num_nodes),
     }

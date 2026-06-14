@@ -2,13 +2,22 @@
 
 from __future__ import annotations
 
+from typing import TypedDict
+
 import torch
 
 from graph_tutorial.datasets import toy_social_graph
 from graph_tutorial.walks import adjacency_lists, cooccurrence_counts, generate_walks, random_walk
 
 
-def run_walk_lab() -> dict[str, object]:
+class WalkLabResult(TypedDict):
+    neighbors: dict[int, list[int]]
+    walk_from_0: list[int]
+    walks: list[list[int]]
+    counts: torch.Tensor
+
+
+def run_walk_lab() -> WalkLabResult:
     """Create a deterministic walk corpus for the toy graph."""
 
     graph = toy_social_graph()

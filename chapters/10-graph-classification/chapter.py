@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import TypedDict
+
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -10,6 +12,13 @@ from graph_tutorial.datasets import GraphData
 from graph_tutorial.gnn_layers import GCNLayer
 from graph_tutorial.graph_utils import degree, edge_list_to_edge_index
 from graph_tutorial.metrics import accuracy
+
+
+class GraphClassifierResult(TypedDict):
+    loss_first: float
+    loss_final: float
+    accuracy: float
+    predictions: list[tuple[str, int]]
 
 
 def graph_from_edges(name: str, edges: list[tuple[int, int]], label: int) -> GraphData:
@@ -51,7 +60,15 @@ class MeanPoolGraphClassifier(nn.Module):
         return self.output(pooled)
 
 
-def train_graph_classifier() -> dict[str, object]:
+def graph_label(graph: GraphData) -> torch.Tensor:
+    """Return a graph-level label, failing loudly if a lab graph is malformed."""
+
+    if graph.y is None:
+        raise ValueError(f"{graph.name} is missing a graph-level label")
+    return graph.y
+
+
+def train_graph_classifier() -> GraphClassifierResult:
     """Train a tiny graph classifier over all toy shapes."""
 
     torch.manual_seed(61)
@@ -63,7 +80,7 @@ def train_graph_classifier() -> dict[str, object]:
         optimizer.zero_grad()
         graph_losses = []
         for graph in graphs:
-            graph_losses.append(F.cross_entropy(model.forward_graph(graph), graph.y))
+            graph_losses.append(F.cross_entropy(model.forward_graph(graph), graph_label(graph)))
         loss = torch.stack(graph_losses).mean()
         loss.backward()
         optimizer.step()
@@ -71,7 +88,7 @@ def train_graph_classifier() -> dict[str, object]:
 
     with torch.no_grad():
         logits = torch.cat([model.forward_graph(graph) for graph in graphs], dim=0)
-    labels = torch.cat([graph.y for graph in graphs])
+    labels = torch.cat([graph_label(graph) for graph in graphs])
     predictions = logits.argmax(dim=1)
     return {
         "loss_first": losses[0],

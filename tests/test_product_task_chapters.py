@@ -1,39 +1,10 @@
 from __future__ import annotations
 
-import importlib.util
-import os
-import subprocess
-import sys
-from pathlib import Path
-
 import torch
 
-ROOT = Path(__file__).resolve().parents[1]
+from tests.chapter_test_utils import ROOT, load_module, run_script
+
 PRODUCT_TASK_CHAPTERS = ["09-link-prediction", "10-graph-classification"]
-
-
-def load_module(path: Path, name: str):
-    spec = importlib.util.spec_from_file_location(name, path)
-    assert spec is not None
-    assert spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
-def run_script(path: Path) -> str:
-    env = os.environ.copy()
-    src_path = str(ROOT / "src")
-    env["PYTHONPATH"] = f"{src_path}{os.pathsep}{env.get('PYTHONPATH', '')}"
-    result = subprocess.run(
-        [sys.executable, str(path)],
-        cwd=ROOT,
-        env=env,
-        text=True,
-        capture_output=True,
-        check=True,
-    )
-    return result.stdout
 
 
 def test_product_task_chapters_have_required_files() -> None:
@@ -67,6 +38,30 @@ def test_chapter_09_solution_scores_edges_by_dot_product() -> None:
     embeddings = torch.tensor([[1.0, 0.0], [0.5, 0.5], [0.0, 1.0]])
     edge_index = torch.tensor([[0, 0], [1, 2]])
     assert solution.score_edges(embeddings, edge_index).tolist() == [0.5, 0.0]
+
+
+def test_chapter_09_train_test_edges_are_disjoint() -> None:
+    chapter = load_module(
+        ROOT / "chapters/09-link-prediction/chapter.py",
+        "chapter_09_chapter",
+    )
+    graph = chapter.bipartite_recommendation_graph()
+    split = chapter.build_link_prediction_split(graph.edge_index)
+
+    def as_edges(edge_index: torch.Tensor) -> set[tuple[int, int]]:
+        return {(int(src), int(dst)) for src, dst in edge_index.t().tolist()}
+
+    train_pos = as_edges(split.train_pos)
+    train_neg = as_edges(split.train_neg)
+    test_pos = as_edges(split.test_pos)
+    test_neg = as_edges(split.test_neg)
+
+    assert train_pos.isdisjoint(test_pos)
+    assert train_neg.isdisjoint(test_neg)
+    assert train_pos.isdisjoint(train_neg)
+    assert train_pos.isdisjoint(test_neg)
+    assert test_pos.isdisjoint(train_neg)
+    assert test_pos.isdisjoint(test_neg)
 
 
 def test_chapter_10_solution_mean_pool_keeps_batch_axis() -> None:

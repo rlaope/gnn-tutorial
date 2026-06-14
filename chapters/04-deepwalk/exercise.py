@@ -2,17 +2,19 @@
 
 from __future__ import annotations
 
+import torch
+
 from graph_tutorial.datasets import toy_social_graph
-from graph_tutorial.walks import cooccurrence_counts, generate_walks
+from graph_tutorial.walks import generate_walks
 
 
-def build_context_counts(walks: list[list[int]], *, num_nodes: int):
+def build_context_counts(_walks: list[list[int]], *, num_nodes: int) -> torch.Tensor:
     """Return co-occurrence counts from walk windows.
 
     TODO: Pass a window_size of at least 1.
     """
 
-    return cooccurrence_counts(walks, num_nodes=num_nodes, window_size=1)
+    return torch.zeros((num_nodes, num_nodes), dtype=torch.float32)
 
 
 def main() -> None:

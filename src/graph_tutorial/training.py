@@ -39,6 +39,8 @@ def train_node_classifier(
         train_mask = torch.ones(graph.num_nodes, dtype=torch.bool)
     else:
         train_mask = graph.train_mask
+    if int(train_mask.sum().item()) == 0:
+        raise ValueError("train_mask must select at least one node")
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     losses: list[float] = []
@@ -54,10 +56,11 @@ def train_node_classifier(
     model.eval()
     with torch.no_grad():
         logits = model(graph.x, graph.edge_index)
+    train_accuracy = accuracy(logits[train_mask], graph.y[train_mask])
     return NodeTrainingResult(
         logits=logits,
         losses=losses,
-        train_accuracy=_masked_accuracy(logits, graph.y, train_mask),
+        train_accuracy=train_accuracy,
         val_accuracy=_masked_accuracy(logits, graph.y, graph.val_mask),
         test_accuracy=_masked_accuracy(logits, graph.y, graph.test_mask),
     )
